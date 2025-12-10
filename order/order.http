@@ -1,21 +1,15 @@
 ### Hello Order
 
-GET localhost:8060/
+GET localhost:8060/api/order
 
 
-### Post Invalid Order
+### Send Order
 
-POST localhost:8060/api/order
-Content-Type: application/json
+GET localhost:8060/api/order/send
 
-{
-  "cart": {
-    "items": []
-  },
-  "billingAddress": {
-  }
-}
+### Menu
 
+GET localhost:8060/api/menu
 
 ### Menu
 
