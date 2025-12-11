@@ -7,3 +7,7 @@ server:
 spring:
   application:
     name: order
+  # rabbitmq:
+  #   listener:
+  #     simple:
+  #       default-requeue-rejected: false

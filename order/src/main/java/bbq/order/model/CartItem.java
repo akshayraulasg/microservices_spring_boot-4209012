@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CartItem {
 
-    @NotBlank
     private String itemId;
     private String itemTitle;
     private BigDecimal itemPrice;
