@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class OrderRestController {
 
     private final OrderRepository orderRepository;
+    private final OrderRestClientPublisher publisher;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -21,7 +22,8 @@ public class OrderRestController {
         // 1. Save Order
         var savedOrder = orderRepository.save(order);
 
-        // 2. TODO: Publish order
+        // 2. Publish order
+        publisher.publish(savedOrder);
 
         // 3. Return order
         return savedOrder;
