@@ -3,10 +3,10 @@ package bbq.order;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import com.github.kkuegler.HumanReadableIdGenerator;
 import com.github.kkuegler.PermutationBasedHumanReadableIdGenerator;
@@ -21,8 +21,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HelloRestController {
 
-    private final RabbitTemplate rabbitTemplate;
-
+    // private final RabbitTemplate rabbitTemplate;
+    private final KafkaTemplate<String, Order> kafkaTemplate;
     private final HumanReadableIdGenerator idGenerator = new PermutationBasedHumanReadableIdGenerator();
 
     @GetMapping
@@ -41,7 +41,7 @@ public class HelloRestController {
         cartItem.setItemPrice(BigDecimal.TEN);
         cart.setItems(List.of(cartItem));
         order.setCart(cart);
-        rabbitTemplate.convertAndSend("orders", "",  order);
+        kafkaTemplate.send("orders", order);
         return "Done";
     }
 

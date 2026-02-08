@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/delivery")
 public class DeliveryRestController {
@@ -27,12 +26,6 @@ public class DeliveryRestController {
     public Delivery getByOrderId(@PathVariable String orderId) {
         return deliveryRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
-    @PostMapping
-    public Delivery post(@RequestBody Order order) {
-        log.info("receive order: {}", order);
-        return deliveryRepository.addNewOrder(order);
     }
 
 }

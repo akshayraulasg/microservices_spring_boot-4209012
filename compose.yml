@@ -1,30 +1,66 @@
-name: freddy-bbq
+name: microservices-get-my-food
 
 services:
 
-  shop-frontend:
-     container_name: shop-frontend
-     build: shop-frontend
-     ports:
-        - "4200:4200"
+   shop-frontend:
+      container_name: shop-frontend
+      build: shop-frontend
+      ports:
+         - "4200:4200"
 
-  order:
-     container_name: order
-     build: order
-     environment:
-       - DELIVERY_SERVICE_URL=http://delivery:8050
-       - KITCHEN_SERVICE_URL=http://kitchen:8070
-     ports:
-        - "8060:8060"
+   order:
+      container_name: order
+      build: order
+      environment:
+         - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      ports:
+         - "8060:8060"
 
-  delivery:
-    container_name: delivery
-    build: delivery
-    ports:
+   delivery:
+      container_name: delivery
+      build: delivery
+      environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      ports:
       - "8050:8050"
 
-  kitchen:
-     container_name: kitchen
-     build: kitchen
-     ports:
-        - "8070:8070"
+   kitchen:
+      container_name: kitchen
+      build: kitchen
+      environment:
+            - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      ports:
+         - "8070:8070"
+
+   kafka-zookeeper:
+      container_name: kafka-zookeeper
+      image: confluentinc/cp-zookeeper:7.7.0
+      environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ports:
+      - "2181:2181"
+
+   kafka:
+      container_name: kafka
+      image: confluentinc/cp-kafka:7.7.0
+      depends_on:
+         - kafka-zookeeper
+      environment:
+         KAFKA_BROKER_ID: 1
+         KAFKA_ZOOKEEPER_CONNECT: kafka-zookeeper:2181
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      ports:
+         - "9092:9092"
+
+   kafka-ui:
+      image: provectuslabs/kafka-ui:v0.7.2
+      depends_on:
+         - kafka
+      ports:
+         - "8090:8080"
+      environment:
+         KAFKA_CLUSTERS_0_NAME: local
+         KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+         KAFKA_CLUSTERS_0_ZOOKEEPER: kafka-zookeeper:2181

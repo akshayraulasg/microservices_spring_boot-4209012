@@ -1,6 +1,7 @@
 package bbq.order;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,26 +19,28 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderRestController {
 
-    private final OrderRabbitMQPublisher publisher;
-
     private final OrderRepository orderRepository;
+
+    private final KafkaTemplate<String, Order> kafkaTemplate;
+
+    // private final OrderKafkaPublisher publisher;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public Order post(@RequestBody Order order) {
         // 1. Save Order
-        var savedOrder = orderRepository.save(order);
 
         // 2. Publish order
-        publisher.publish(savedOrder);
+        // publisher.publish(savedOrder);
+        kafkaTemplate.send("orders", order);
 
         /* Check and fix if order crash still results in order in delivery.orders */
         if (true)
             throw new RuntimeException("Order Crash from OrderRestController");
 
         // 3. Return order
-        return savedOrder;
+        return order;
     }
 
 }
