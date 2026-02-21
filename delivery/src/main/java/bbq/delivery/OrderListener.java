@@ -7,6 +7,7 @@ import bbq.delivery.model.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
 
 @Service
 @Slf4j
@@ -28,6 +29,7 @@ public class OrderListener {
     //     deliveryRepository.addNewOrder(order);
     // }
 
+    @RetryableTopic(attempts = "2")
     @KafkaListener(topics = "orders", groupId = "delivery", properties = {"spring.json.value.default.type=bbq.delivery.model.Order"})
     public void onOrder(Order order) {
         log.info("Received order: {}", order);
